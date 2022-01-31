@@ -73,6 +73,54 @@ public class ApiClient {
         return blog;
     }
 
+     public boolean getBlogbyId(Blog blog) {
+         //Blog[] blog = {};
+
+         String target = "/blog/view/"+blog.id;
+         BufferedReader reader;
+         String line;
+         StringBuilder responseContent = new StringBuilder();
+         boolean success = false;
+
+         try {
+             URL url = new URL(apiAddress + target);
+             connection = (HttpURLConnection) url.openConnection();
+             connection.setRequestMethod("GET");
+             connection.setRequestProperty("accept", "application/json");
+
+             int status = connection.getResponseCode();
+
+             if (status >= 300) {
+                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                 while ((line = reader.readLine()) != null) {
+                     responseContent.append(line);
+
+                 }
+                 reader.close();
+             } else {
+                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                 while ((line = reader.readLine()) != null) {
+                     responseContent.append(line);
+
+                 }
+                 reader.close();
+             }
+
+             //String jsonStr = responseContent.toString();
+
+             //ObjectMapper mapper = new ObjectMapper();
+
+            // blog = mapper.readValue(jsonStr, Blog[].class);
+
+         } catch (Exception e) {
+             System.out.println("Exception: " + e);
+         } finally {
+             connection.disconnect();
+         }
+
+         return success;
+     }
+
     public boolean deleteBlog() {
 
         String target = "/blog/clear";
@@ -111,12 +159,13 @@ public class ApiClient {
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
             connection.setDoOutput(true);
 
-            try (OutputStream os = connection.getOutputStream()) {
+              try (OutputStream os = connection.getOutputStream()) {
 
-                byte[] input = newBlog.toJson().getBytes(StandardCharsets.UTF_8);
+                  byte[] input = newBlog.toJson().getBytes(StandardCharsets.UTF_8);
 
-                os.write(input, 0, input.length);
-            }
+                  os.write(input, 0, input.length);
+              }
+
 
             int status = connection.getResponseCode();
 

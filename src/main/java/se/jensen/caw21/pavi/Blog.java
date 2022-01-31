@@ -75,6 +75,18 @@ public class Blog implements Jsonable {
         return this.title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     @Override
     public String toJson() {
         final StringWriter writable = new StringWriter();
