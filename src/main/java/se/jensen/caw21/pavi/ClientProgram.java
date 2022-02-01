@@ -64,46 +64,30 @@ public class ClientProgram {
         System.out.println("Enter Id:");
         int id=getUserInt();
         int i=0;
-        for (i =0;i < blog.length;i++){
-            if(id==blog[i].id){
+        if (blog.length > 0) {
+            for (i = 0; i < blog.length; i++) {
+                if (id == blog[i].id) {
+                    break;
+                }
+            }
+                String title = blog[i].title;
+                String author = blog[i].author;
+                String description = blog[i].description;
 
                 boolean success = myApiClient.getBlogbyId(blog[i]);
-            }
+                System.out.println("ID: " + id);
+                System.out.println("--------------------------------------------");
+                System.out.println( "Title: "+ title);
+                System.out.println("Description: " +description);
+                System.out.println("Author: "+ author);
+                System.out.println();
 
+
+        } else {
+            System.out.println("No Blogs in list :(");
         }
     }
 
-    /*private void searchBlogbyId() {
-        Blog[] searchBlog= myApiClient.getBlog();
-
-        if (searchBlog.length > 0) {
-            System.out.println("Enter the Id ");
-            int searchingId=getUserInt();
-            System.out.println();
-
-            for (int i = 0; i < searchBlog.length; i++) {
-                if(searchBlog[i].id==searchingId){
-
-                    String title = searchBlog[i].title;
-                    String author = searchBlog[i].author;
-                    String description = searchBlog[i].description;
-                    int id = searchBlog[i].id;
-
-                    System.out.println("ID: " + id);
-                    System.out.println("--------------------------------------------");
-                    System.out.println("Title: " + title);
-                    System.out.println("Description: " + description);
-                    System.out.println("Author: " + author);
-                    System.out.println();
-
-                } else {
-                    System.out.println("There is no Blog with ID " + searchingId +" in the list.");
-                }
-            }
-        }else {
-            System.out.println("The Blog List is Empty");
-        }
-    } */
 
     private void updateBlogbyId() {
         Blog[] blog = myApiClient.getBlog();
