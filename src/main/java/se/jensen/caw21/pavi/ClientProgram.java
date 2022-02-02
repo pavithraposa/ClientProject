@@ -61,27 +61,35 @@ public class ClientProgram {
 
     private void searchBlogbyId() {
         Blog[] blog = myApiClient.getBlog();
-        System.out.println("Enter Id:");
-        int id=getUserInt();
         int i=0;
+        int blogCount=0;
         if (blog.length > 0) {
+            System.out.println("Enter Id:");
+            int id=getUserInt();
+            String title;
+            String author;
+            String description;
             for (i = 0; i < blog.length; i++) {
-                if (id == blog[i].id) {
-                    break;
+                if (id != blog[i].id) {
+                    blogCount++;
+
+                } else if (id==blog[i].id){
+                    title = blog[i].title;
+                    author = blog[i].author;
+                    description = blog[i].description;
+                    boolean success = myApiClient.getBlogbyId(blog[i]);
+                    System.out.println("ID: " + id);
+                    System.out.println("--------------------------------------------");
+                    System.out.println( "Title: "+ title);
+                    System.out.println("Description: " +description);
+                    System.out.println("Author: "+ author);
+                    System.out.println();
                 }
             }
-                String title = blog[i].title;
-                String author = blog[i].author;
-                String description = blog[i].description;
 
-                boolean success = myApiClient.getBlogbyId(blog[i]);
-                System.out.println("ID: " + id);
-                System.out.println("--------------------------------------------");
-                System.out.println( "Title: "+ title);
-                System.out.println("Description: " +description);
-                System.out.println("Author: "+ author);
-                System.out.println();
-
+            if(blogCount==blog.length){
+                System.out.println("The Blog with id ' " + id + " ' is not in the List.");
+            }
 
         } else {
             System.out.println("No Blogs in list :(");
@@ -91,19 +99,24 @@ public class ClientProgram {
 
     private void updateBlogbyId() {
         Blog[] blog = myApiClient.getBlog();
-        System.out.println("Enter id:");
-        int id = getUserInt();
+
         int i = 0;
+        int count=0;
         if (blog.length > 0) {
+            System.out.println("Enter id:");
+            int id = getUserInt();
             for (i = 0; i < blog.length; i++) {
-                if (id == blog[i].id) {
-                    System.out.println("Update the Title?");
+                if (id != blog[i].id) {
+                    count++;
+                } else if(id==blog[i].id) {
+
+                    System.out.println("Update the Title:");
                     String title=getUserString();
 
-                    System.out.println("Author:");
+                    System.out.println("Update Author:");
                     String author=getUserString();
 
-                    System.out.println("description");
+                    System.out.println("Update Description");
                     String description=getUserString();
 
                     Blog updatingBlog = new Blog(id,title, description, author);
@@ -113,9 +126,9 @@ public class ClientProgram {
                     } else {
                         System.out.println("Issue updating Blog. :(");
                     }
-                }else{
-                    System.out.println("There is no Blog with id: " + id);
                 }
+            }if(count==blog.length){
+                System.out.println("There is no Blog with id: " + id);
             }
 
         } else {
@@ -165,22 +178,33 @@ public class ClientProgram {
     }
 
     private void deleteBlogbyId() {
-        System.out.println("What is the Id:");
-        int deletingid = getUserInt();
+
         Blog[] blog = myApiClient.getBlog();
         int i=0;
+        int count=0;
         if(blog.length>0) {
+            System.out.println("What is the Id:");
+            int deletingid = getUserInt();
             for ( i = 0; i < blog.length; i++) {
-                if (deletingid == blog[i].id) {
-                    break;
+                if (deletingid != blog[i].id) {
+                    count++;
                 }
+                else if(deletingid==blog[i].id){
+
+                    boolean success = myApiClient.deleteBlogbyId(blog[i]);
+
+                    if (success) {
+                        System.out.println("Blog with id " + deletingid + " is deleted Successfully :)");
+                    } else {
+                        System.out.println("Issue deleting Blog. :(");
+                    }
+
+                }
+            }if(count==blog.length){
+                System.out.println("There is no Blog with id ' " + deletingid + " ' in the List.");
             }
-            boolean success = myApiClient.deleteBlogbyId(blog[i]);
-            if (success) {
-                System.out.println("Blog with id " + deletingid + " is deleted Successfully :)");
-            } else {
-                System.out.println("Issue deleting Blog. :(");
-            }
+
+
         }else {
             System.out.println("The list is Empty");
         }
@@ -189,12 +213,12 @@ public class ClientProgram {
 
 
     private void createNewBlog() {
-        System.out.println("What's the blog Title?");
+        System.out.println("Enter the Title:");
         String title = getUserString();
 
-        System.out.println("Author:");
+        System.out.println("Enter the AuthorName:");
         String  author = getUserString();
-        System.out.println("description");
+        System.out.println("Enter description :");
         String  description=getUserString();
 
         Blog newBlog = new Blog(title, description, author);
