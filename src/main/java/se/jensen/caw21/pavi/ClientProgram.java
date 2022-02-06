@@ -1,14 +1,16 @@
 package se.jensen.caw21.pavi;
 
-import java.text.AttributedCharacterIterator;
 import java.util.Scanner;
 
 public class ClientProgram {
     private ApiClient myApiClient;
 
     public ClientProgram() {
+
         myApiClient = new ApiClient("http://127.0.0.1:8080/api/v1");
+       // myNASA = new nasa("http://127.0.0.1:8080/api/v1);
     }
+
 
     public void start() {
         boolean program = true;
@@ -48,7 +50,9 @@ public class ClientProgram {
                 case 6:
                     searchBlogbyId();
                     break;
+
                 case 7:
+                    exitBlog();
                     System.out.println("Exiting the program");
                     System.out.println("BYE BYE!!");
                     program=false;
@@ -58,6 +62,20 @@ public class ClientProgram {
         }
 
     }
+
+    private void exitBlog() {
+
+        if(myApiClient.exitBlog()){
+            System.out.println("List of Blog cleared!");
+        }
+
+
+        else{
+            System.out.println("Issue clearing list of Blog. :(");
+        }
+
+    }
+
 
     private void searchBlogbyId() {
         System.out.println("Search Blog By ID");
@@ -88,39 +106,49 @@ public class ClientProgram {
     private void updateBlogbyId() {
         System.out.println("update Blog By Id");
         System.out.println("Enter Id:");
-        int id=getUserInt();
-        Blog blog = myApiClient.updateBlogbyId(id);
+        int id = getUserInt();
+        Blog updateBlog = myApiClient.getBlogbyId(id);
 
-        if(blog!=null) {
 
-            System.out.println("Update the Title:");
-            blog.title=getUserString();
+        if (updateBlog != null) {
 
-            System.out.println("Update Author:");
-            blog.author=getUserString();
+            //int blogId = updateBlog.getId();
+           // if (id == blogId) {
+                //blog = myApiClient.updateBlogbyId(updateBlog, id);
+                System.out.println("What do you want to update in Blog?");
+                System.out.println("1.Title");
+                System.out.println("2.Description");
+                System.out.println("3.Author");
+                int userChoice = getUserInt();
+                if (userChoice == 1) {
 
-            System.out.println("Update Description");
-            blog.description=getUserString();
-            id=blog.id;
+                    System.out.println("Update the Title:");
+                    String title = getUserString();
+                    updateBlog.setTitle(title);
+                    //System.out.println("Title: " + title);
+                } else if (userChoice == 2) {
 
-            System.out.println("ID: " + id);
-            System.out.println("--------------------------------------------");
-            System.out.println( "Title: "+ blog.title);
-            System.out.println("Description: " +blog.description);
-            System.out.println("Author: "+ blog.author);
-            System.out.println();
-            Blog updatingBlog = new Blog(id,blog.title, blog.description, blog.author);
-            //(id,blog.title, blog.author, blog.description);
-            System.out.println("Blog Updated :)");
+                    System.out.println("Update Description");
+                    String description = getUserString();
+                    updateBlog.setDescription(description);
+                    //System.out.println("Description: " + description);
+                } else if (userChoice == 3) {
 
-        }
+                    System.out.println("Update AuthorName");
+                    String author = getUserString();
+                    updateBlog.setAuthor(author);
 
-        else {
+                    //System.out.println("Author: " + author);
+
+                }
+                int blogId= updateBlog.getId();
+                myApiClient.updateBlogbyId(updateBlog, id);
+                System.out.println("Blog Id: " + blogId + " has been updated");
+        } else {
             System.out.println("There is no Blog with id" + id +"in the list.");
         }
 
     }
-
 
     private void printListOfBlogs() {
         Blog[] blog = myApiClient.getBlog();
@@ -152,12 +180,12 @@ public class ClientProgram {
     private void deleteAllBlogs() {
 
         if(myApiClient.deleteBlog()){
-            System.out.println("List of Blog cleared!");
+            System.out.println("Exiting Successfully");
         }
 
 
         else{
-            System.out.println("Issue clearing list of Blog. :(");
+            System.out.println("Issue with files :(");
         }
     }
 
