@@ -3,11 +3,8 @@ package se.jensen.caw21.pavi;
 import com.github.cliftonlabs.json_simple.JsonKey;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsonable;
-
-
 import java.io.StringWriter;
 import java.io.Writer;
-
 
 public class Blog implements Jsonable {
     public String title;
@@ -41,7 +38,6 @@ public class Blog implements Jsonable {
     }
 
     public Blog() {
-
     }
 
     public Blog(String title, String description, String author) {
@@ -56,7 +52,6 @@ public class Blog implements Jsonable {
         this.title=title;
         this.description=description;
         this.author=author;
-
     }
 
     public int getId() {

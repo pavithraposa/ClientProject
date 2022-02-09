@@ -2,7 +2,6 @@ package se.jensen.caw21.pavi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cliftonlabs.json_simple.JsonObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -11,23 +10,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import org.springframework.web.reactive.function.client.WebClient;
-  import reactor.core.publisher.Flux;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-
-
-
-
-
-
-
-
-
 public class ApiClient {
-
     private String apiAddress;
     HttpURLConnection connection;
 
@@ -43,8 +26,8 @@ public class ApiClient {
 
     public Blog[] getBlog() {
         Blog[] blog = {};
-
         String target = "/blog/list";
+        System.out.println("apiAddress: " + apiAddress + target);
         BufferedReader reader;
         String line;
         StringBuilder responseContent = new StringBuilder();
@@ -56,6 +39,7 @@ public class ApiClient {
             connection.setRequestProperty("accept", "application/json");
 
             int status = connection.getResponseCode();
+            System.out.println("HTTP status code: "+ status);
 
             if (status >= 300) {
                 reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
@@ -68,34 +52,30 @@ public class ApiClient {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 while ((line = reader.readLine()) != null) {
                     responseContent.append(line);
-
                 }
                 reader.close();
             }
-
             String jsonStr = responseContent.toString();
-
             ObjectMapper mapper = new ObjectMapper();
-
             blog = mapper.readValue(jsonStr, Blog[].class);
 
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         } finally {
             connection.disconnect();
         }
-
         return blog;
     }
 
     public Blog getBlogbyId(int id) {
-        Blog blog = null;
 
+        Blog blog = null;
         String target = "/blog/view/" + id;
+        System.out.println("apiAdress: " + apiAddress + target);
         BufferedReader reader;
         String line;
         StringBuilder responseContent = new StringBuilder();
-        //boolean success = false;
 
         try {
             URL url = new URL(apiAddress + target);
@@ -104,41 +84,48 @@ public class ApiClient {
             connection.setRequestProperty("accept", "application/json");
 
             int status = connection.getResponseCode();
+            System.out.println("HTTP status code: "+ status);
 
             if (status >= 300) {
-                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                while ((line = reader.readLine()) != null) {
-                    responseContent.append(line);
-                    System.out.println("Issue finding ID");
+                if(connection.getErrorStream()!=null){
+                    reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                    while ((line = reader.readLine()) != null) {
+                        responseContent.append(line);
+                        System.out.println("Issue finding ID");
+
+                    }
+                    reader.close();
 
                 }
-                reader.close();
+
             } else {
-                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                while ((line = reader.readLine()) != null) {
-                    responseContent.append(line);
+                if(connection.getInputStream()!=null){
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    while ((line = reader.readLine()) != null) {
+                        responseContent.append(line);
+
+                    }
+                    reader.close();
 
                 }
-                reader.close();
-            }
-
-            if (status == 200) {
                 String jsonStr = responseContent.toString();
                 ObjectMapper mapper = new ObjectMapper();
                 blog = mapper.readValue(jsonStr, Blog.class);
+
             }
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         } finally {
             connection.disconnect();
         }
-
         return blog;
     }
 
     public boolean deleteBlog() {
 
         String target = "/blog/clear";
+        System.out.println("apiAddress: " + apiAddress + target);
         boolean success = false;
 
         try {
@@ -147,37 +134,34 @@ public class ApiClient {
             connection.setRequestMethod("DELETE");
 
             int status = connection.getResponseCode();
+            System.out.println("HTTP status code: "+ status);
 
             if (status < 300) {
                 success = true;
-
             }
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         } finally {
             connection.disconnect();
         }
-
         return success;
     }
 
-    public Blog updateBlogbyId(Blog updateBlog, int id) {
-        //Blog blog=null;
+    public boolean updateBlogbyId(Blog updateBlog, int id) {
 
-        String target = "/blog/update/" + id; // http://127.0.0.1:8080/api/v1/blog/delete
+        String target = "/blog/update/" + id;
+        System.out.println("apiAddress: " + apiAddress + target);
         System.out.println(apiAddress + target);
-        //System.out.println(updateBlog);
-
         boolean success = false;
 
         try {
             URL url = new URL(apiAddress + target);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
-            //connection.setRequestProperty("Content-Type", "application/json; utf-8");
             connection.setDoOutput(true);
+
             try (OutputStream os = connection.getOutputStream()) {
                 if (connection.getOutputStream() != null) {
                     byte[] input = updateBlog.toJson().getBytes(StandardCharsets.UTF_8);
@@ -186,72 +170,67 @@ public class ApiClient {
             }
 
             int status = connection.getResponseCode();
-            System.out.println("Status: " + status);
-            if (status < 300) {
-                success = true;
-
+            System.out.println("HTTP status code: "+ status);
+            if(status<300){
+                success=true;
             }
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         } finally {
             connection.disconnect();
         }
-
-        return updateBlog;
-    }                    //deleteBlogbyId(int i
+        return success;
+    }
 
     public Blog deleteBlogbyId(int id) {
+
         Blog blog = null;
-
-        String target = "/blog/delete/" + id; // http://127.0.0.1:8080/api/v1/blog/delete
-
+        String target = "/blog/delete/" + id;
+        System.out.println("apiAdress: " + apiAddress + target);
         boolean success = false;
-
         try {
             URL url = new URL(apiAddress + target);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("DELETE");
 
             int status = connection.getResponseCode();
+            System.out.println("HTTP status code: "+ status);
+
             if (status > 300) {
                 System.out.println("Issue deleting Id");
             }
-
             if (status < 300) {
                 success = true;
-
             }
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         } finally {
             connection.disconnect();
         }
-
         return blog;
-    }                    //deleteBlogbyId(int id)
-
+    }
 
     public boolean addBlog(Blog newBlog) {
         String target = "/blog/create";
+        System.out.println("apiAdress: " + apiAddress + target);
         boolean success = false;
 
         try {
-
             URL url = new URL(apiAddress + target);
-
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json; utf-8");
             connection.setDoOutput(true);
 
             try (OutputStream os = connection.getOutputStream()) {
-
                 byte[] input = newBlog.toJson().getBytes(StandardCharsets.UTF_8);
-
                 os.write(input, 0, input.length);
             }
 
             int status = connection.getResponseCode();
+            System.out.println("HTTP status code: "+ status);
 
             if (status < 300) {
                 success = true;
@@ -259,6 +238,7 @@ public class ApiClient {
 
         } catch (Exception e) {
             System.out.println("Exception: " + e);
+            e.printStackTrace();
         } finally {
             connection.disconnect();
         }
@@ -267,8 +247,8 @@ public class ApiClient {
 
      public boolean exitBlog() {
           String target = "/blog/exit";
+         System.out.println("apiAdress: " + apiAddress + target);
           boolean success = false;
-
           try {
               URL url = new URL(apiAddress + target);
               connection = (HttpURLConnection) url.openConnection();
@@ -285,41 +265,8 @@ public class ApiClient {
           } finally {
               connection.disconnect();
           }
-
           return success;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
      }
-
-
-
-
-
-
-
-
-
 }
 
 
